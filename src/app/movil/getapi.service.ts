@@ -30,6 +30,7 @@ export class GetapiService {
   }
   getPokeImage(index: number){
     return `${environment.pokemonApi.imageUrl}/${index}.png`
+    
   }
 }
 
