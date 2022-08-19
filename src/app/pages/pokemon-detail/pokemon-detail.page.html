@@ -1,9 +1,175 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>pokemon-detail</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="letter content" >
+  <ion-fab vertical="top" horizontal="start" style="padding-top: 0.2em;padding-bottom: 0.2em;" slot="fixed">
+    <ion-fab-button color="light" style="width: 45px; height: 45px;">
+      <ion-back-button defaultHref="/" color="dark" text="" icon="chevron-back"></ion-back-button>
+    </ion-fab-button>
+  </ion-fab>
 
-<ion-content>
+  <ion-fab vertical="top" horizontal="end" style="padding-top: 0.2em;padding-bottom: 0.2em;" slot="fixed">
+    <ion-fab-button color="light" style="width: 45px; height: 45px;">
+      <ion-back-button defaultHref="/" color="dark" text="" icon="heart-outline"></ion-back-button>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ng-container *ngIf="details">
+
+    <ion-grid fixed class="top-header ion-padding">
+      <ion-row>
+        <ion-col size="8" class="ion-text-start col-strech">
+          <ion-text>
+            <h1 style="font-weight: 700;">{{ details.name|titlecase}}</h1>
+          </ion-text>
+        </ion-col>
+        <ion-col size="4" class="ion-text-end ion-text-center col-strech">
+          <ion-text color="medium">
+            <h4>#{{ details.id }}</h4>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-chip [ngClass]="t.type.name" *ngFor="let t of details.types">
+            <ion-label class="ion-text-capitalize">{{ t.type.name }}</ion-label>
+          </ion-chip>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <div style="height: 150px;">
+      <img class="img-pokemon animated"
+        src="https://assets.pokemon.com/assets/cms2/img/pokedex/full/{{details.id | number:'3.0-0'}}.png" />
+    </div>
+  </ng-container>
+
+
+  <div class="info-detail">
+    <ion-grid fixed>
+      <ion-row class="rowContent">
+        <ion-col size=12>
+          <ion-segment mode="md" scrollable [(ngModel)]="categories">
+            <ion-segment-button value='about'>
+              <ion-label class="title ion-text-capitalize letter"><b>Information</b></ion-label>
+            </ion-segment-button>
+            <ion-segment-button value='base'>
+              <ion-label class="title ion-text-capitalize letter"><b>Base Status</b></ion-label>
+            </ion-segment-button>
+            <ion-segment-button value='evolution'>
+              <ion-label class="title ion-text-capitalize letter"><b>Evolution</b></ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <ion-grid fixed>
+      <div [ngSwitch]="categories">
+        <div *ngSwitchCase="'about'">
+          <p class="padd-text">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam nemo ducimus quaerat quis ad iusto
+            corrupti,
+            similique tenetur temporibus, ex consequuntur at iure porro mollitia impedit animi illo sequi
+            exercitationem!
+          </p>
+          <div *ngIf="details">
+            <ion-card class="letter" mode="ios">
+              <ion-card-content>
+                <ion-row>
+                  <ion-col size="6">
+                    <ion-label>Height</ion-label>
+                    <p>
+                      <b>{{ (details.height / 10) | number:'1.2-2' }} m </b>
+                    </p>
+                  </ion-col>
+                  <ion-col size="6">
+                    <ion-label>Weight</ion-label>
+                    <p>
+                      <b>{{ (details.weight / 10) | number:'1.2-2' }} kg</b>
+                    </p>
+                  </ion-col>
+                </ion-row>
+              </ion-card-content>
+            </ion-card>
+            <div class="padd-text">
+              <p><b>Base Experience</b>: {{ details.base_experience }}</p>
+              <p><b>Abilities</b>:</p>
+              <ion-chip *ngFor="let a of details.abilities">
+                <ion-label class="ion-text-capitalize letter">{{ a.ability.name }}</ion-label>
+              </ion-chip>
+            </div>
+          </div>
+        </div>
+
+        <div *ngSwitchCase="'base'">
+          <div *ngIf="details">
+            <ion-card mode="ios" class="letter">
+              <ion-card-content>
+                <ion-list lines="full">
+                  <ion-list-header>
+                    Base Stats
+                  </ion-list-header>
+                  <ion-item *ngFor="let s of details.stats" class="ion-text-capitalize">
+                    <ion-label slot="start" color="medium" class="letter">{{ s.stat.name }}: </ion-label>
+                    <ion-label slot="end">
+                      {{ s.base_stat }}
+                    </ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-label slot="start" class="letter">Total:</ion-label>
+                    <ion-label slot="end">
+                      <b>{{ statsSum }}</b>
+                    </ion-label>
+                  </ion-item>
+                </ion-list>
+              </ion-card-content>
+            </ion-card>
+          </div>
+        </div>
+
+        <div *ngSwitchCase="'evolution'">
+          <div *ngIf="evolutionChainDetailsList">
+            <div class="padd-text">
+              <h4>Evolution Chain</h4>
+              <ion-grid>
+                <ion-row *ngFor="let ecd of evolutionChainDetailsList; let isLast = last">
+                  <ng-container *ngIf="(ecd.triggerName == 'level-up' && ecd.minlevel); else itemEvolution">
+                    <ion-col class="ion-text-center" size="12">
+                      <span>(Level {{ecd.minlevel}})</span>
+                    </ion-col>
+                  </ng-container>
+                  <ng-template #itemEvolution>
+                    <ng-container *ngIf="ecd.triggerName == 'use-item' && ecd.item">
+                      <ion-col class="ion-text-center" size="12">
+                        <p class="ion-text-capitalize">(Use <b>{{ecd.item.name}}</b>)</p>
+                        <img
+                          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/{{ecd.item.name}}.png" />
+                      </ion-col>
+                    </ng-container>
+                  </ng-template>
+
+                  <ion-col size="12">
+                    <br>
+                    <div class="center">
+                      <img class="img-evolution"
+                        src="https://assets.pokemon.com/assets/cms2/img/pokedex/detail/{{ecd.pokemonIndex | number:'3.0-0'}}.png" />
+                    </div>
+                    <div class="center">
+                      <ion-text class="ion-text-capitalize">{{ecd.speciesName}}</ion-text>
+                    </div>
+                    <br>
+                  </ion-col>
+
+                  <ion-col class="ion-text-center" *ngIf="!isLast" size="12">
+                    <ion-icon name="arrow-down-outline" color="medium"></ion-icon>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </ion-grid>
+  </div>
 
 </ion-content>

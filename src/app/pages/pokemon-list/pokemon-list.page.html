@@ -8,7 +8,7 @@
   <ion-grid fixed>
     <ion-row>
       <ion-col size="6" *ngFor="let item of pokenListy">
-        <ion-card class="padding-card letter">
+        <ion-card class="padding-card letter" routerLink="/pokemon-detail/{{item.pokeIndex}}">
           <ion-grid fixed>
             <ion-row>
               <ion-col size="12">
